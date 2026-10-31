@@ -1,0 +1,50 @@
+{
+  "packageId": "ru.dunhuatv.app",
+  "host": "ВАШ_ДОМЕН.ru",
+  "name": "Дунхуа ТВ",
+  "shortName": "Дунхуа ТВ",
+  "launcherName": "Дунхуа ТВ",
+  "display": "fullscreen",
+  "themeColor": "#E94560",
+  "navigationColor": "#0A0A1A",
+  "navigationDividerColor": "#0A0A1A",
+  "backgroundColor": "#0A0A1A",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://ВАШ_ДОМЕН.ru/icons/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "dunhuatv"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [
+    {
+      "name": "Каталог",
+      "shortName": "Каталог",
+      "url": "/catalog",
+      "icons": [
+        {
+          "src": "https://ВАШ_ДОМЕН.ru/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://ВАШ_ДОМЕН.ru/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "orientation": "landscape",
+  "fingerprints": [],
+  "additionalFeatures": {
+    "locationEnabled": false,
+    "webShareTarget": false
+  }
+}
