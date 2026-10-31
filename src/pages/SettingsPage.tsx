@@ -1,8 +1,5 @@
 import { AppSettings } from '../types';
-import { 
-  Settings as SettingsIcon, Play, Monitor, Volume2, 
-  Type, Gauge, Palette, RotateCcw, Info
-} from 'lucide-react';
+import { Settings as SettingsIcon, Play, Monitor, Volume2, Type, Palette, RotateCcw, Info, Tv, Keyboard } from 'lucide-react';
 
 interface SettingsPageProps {
   settings: AppSettings;
@@ -27,228 +24,269 @@ export default function SettingsPage({ settings, setSettings }: SettingsPageProp
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 max-w-4xl">
+    <div className="min-h-screen p-8 lg:p-12 max-w-5xl">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <SettingsIcon size={28} className="text-[#e94560]" />
-          <h1 className="text-3xl font-bold text-white">Настройки</h1>
+      <div className="mb-10">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--tv-accent)] to-[#c73e54] flex items-center justify-center shadow-lg shadow-[var(--tv-accent)]/20">
+            <SettingsIcon size={28} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-black text-white">Настройки</h1>
+            <p className="text-[var(--tv-text-secondary)] text-lg">Настройте воспроизведение и интерфейс</p>
+          </div>
         </div>
-        <p className="text-[#a0a0c0]">Настройте воспроизведение и интерфейс под себя</p>
       </div>
 
-      <div className="space-y-6">
-        {/* Playback Settings */}
-        <section className="bg-[#1a1a3e] rounded-2xl p-6 border border-[#252550]">
-          <div className="flex items-center gap-2 mb-5">
-            <Play size={20} className="text-[#e94560]" />
-            <h2 className="text-lg font-semibold text-white">Воспроизведение</h2>
+      <div className="space-y-8">
+        {/* Playback */}
+        <section className="bg-[var(--tv-surface)] rounded-2xl p-8 border border-[var(--tv-border)]">
+          <div className="flex items-center gap-3 mb-6">
+            <Play size={24} className="text-[var(--tv-accent)]" />
+            <h2 className="text-2xl font-bold text-white">Воспроизведение</h2>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-6">
             {/* Autoplay */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Автовоспроизведение</p>
-                <p className="text-[#a0a0c0] text-sm">Автоматически начинать воспроизведение</p>
-              </div>
+            <SettingRow
+              title="Автовоспроизведение"
+              description="Автоматически начинать воспроизведение при открытии серии"
+            >
               <button
                 onClick={() => updateSetting('autoplay', !settings.autoplay)}
-                className={`tv-focusable w-14 h-7 rounded-full transition-all relative ${
-                  settings.autoplay ? 'bg-[#e94560]' : 'bg-[#252550]'
-                }`}
+                className={`toggle-switch ${settings.autoplay ? 'on' : 'off'}`}
+                tabIndex={0}
+                role="switch"
+                aria-checked={settings.autoplay}
+                onKeyDown={(e) => e.key === 'Enter' && updateSetting('autoplay', !settings.autoplay)}
               >
-                <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-all ${
-                  settings.autoplay ? 'right-1' : 'left-1'
-                }`} />
+                <div className="toggle-knob" />
               </button>
-            </div>
+            </SettingRow>
 
             {/* Quality */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Качество видео</p>
-                <p className="text-[#a0a0c0] text-sm">Выберите предпочитаемое качество</p>
+            <SettingRow
+              title="Качество видео"
+              description="Предпочитаемое качество по умолчанию"
+            >
+              <div className="flex gap-2">
+                {['480p', '720p', '1080p', 'Авто'].map(q => (
+                  <button
+                    key={q}
+                    onClick={() => updateSetting('quality', q === 'Авто' ? 'auto' : q.toLowerCase())}
+                    className={`tv-btn px-5 py-3 rounded-xl text-sm font-bold transition-all ${
+                      settings.quality === (q === 'Авто' ? 'auto' : q.toLowerCase())
+                        ? 'bg-[var(--tv-accent)] text-white'
+                        : 'bg-[var(--tv-card)] text-[var(--tv-text-secondary)] hover:text-white border border-[var(--tv-border)]'
+                    }`}
+                    tabIndex={0}
+                  >
+                    {q}
+                  </button>
+                ))}
               </div>
-              <select
-                value={settings.quality}
-                onChange={(e) => updateSetting('quality', e.target.value)}
-                className="tv-focusable px-4 py-2 bg-[#252550] border border-[#353570] rounded-lg text-white text-sm focus:border-[#e94560] focus:outline-none cursor-pointer"
-              >
-                <option value="480p">480p</option>
-                <option value="720p">720p HD</option>
-                <option value="1080p">1080p Full HD</option>
-                <option value="auto">Авто</option>
-              </select>
-            </div>
+            </SettingRow>
 
-            {/* Playback Speed */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Скорость воспроизведения</p>
-                <p className="text-[#a0a0c0] text-sm">Стандартная скорость по умолчанию</p>
+            {/* Speed */}
+            <SettingRow
+              title="Скорость воспроизведения"
+              description="Стандартная скорость по умолчанию"
+            >
+              <div className="flex gap-2">
+                {[0.5, 0.75, 1, 1.25, 1.5, 2].map(speed => (
+                  <button
+                    key={speed}
+                    onClick={() => updateSetting('playbackSpeed', speed)}
+                    className={`tv-btn px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      settings.playbackSpeed === speed
+                        ? 'bg-[var(--tv-accent)] text-white'
+                        : 'bg-[var(--tv-card)] text-[var(--tv-text-secondary)] hover:text-white border border-[var(--tv-border)]'
+                    }`}
+                    tabIndex={0}
+                  >
+                    {speed}x
+                  </button>
+                ))}
               </div>
-              <select
-                value={settings.playbackSpeed}
-                onChange={(e) => updateSetting('playbackSpeed', parseFloat(e.target.value))}
-                className="tv-focusable px-4 py-2 bg-[#252550] border border-[#353570] rounded-lg text-white text-sm focus:border-[#e94560] focus:outline-none cursor-pointer"
-              >
-                <option value={0.5}>0.5x</option>
-                <option value={0.75}>0.75x</option>
-                <option value={1}>1x (Нормальная)</option>
-                <option value={1.25}>1.25x</option>
-                <option value={1.5}>1.5x</option>
-                <option value={2}>2x</option>
-              </select>
-            </div>
+            </SettingRow>
 
             {/* Volume */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Volume2 size={18} className="text-[#a0a0c0]" />
-                <div>
-                  <p className="text-white font-medium">Громкость</p>
-                  <p className="text-[#a0a0c0] text-sm">Стандартный уровень громкости</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
+            <SettingRow
+              title="Громкость"
+              description="Стандартный уровень громкости"
+            >
+              <div className="flex items-center gap-4">
+                <Volume2 size={20} className="text-[var(--tv-text-secondary)]" />
                 <input
                   type="range"
-                  min={0}
-                  max={100}
+                  min={0} max={100}
                   value={settings.volume}
                   onChange={(e) => updateSetting('volume', parseInt(e.target.value))}
-                  className="tv-focusable w-32 h-2 bg-[#252550] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#e94560]"
+                  className="progress-bar w-48"
                 />
-                <span className="text-white text-sm w-10 text-right">{settings.volume}%</span>
+                <span className="text-white font-bold text-lg w-12 text-right">{settings.volume}%</span>
               </div>
-            </div>
+            </SettingRow>
           </div>
         </section>
 
         {/* Subtitles */}
-        <section className="bg-[#1a1a3e] rounded-2xl p-6 border border-[#252550]">
-          <div className="flex items-center gap-2 mb-5">
-            <Type size={20} className="text-[#e94560]" />
-            <h2 className="text-lg font-semibold text-white">Субтитры</h2>
+        <section className="bg-[var(--tv-surface)] rounded-2xl p-8 border border-[var(--tv-border)]">
+          <div className="flex items-center gap-3 mb-6">
+            <Type size={24} className="text-[var(--tv-accent)]" />
+            <h2 className="text-2xl font-bold text-white">Субтитры</h2>
           </div>
 
-          <div className="space-y-5">
-            {/* Subtitles toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Показывать субтитры</p>
-                <p className="text-[#a0a0c0] text-sm">Включить субтитры при воспроизведении</p>
-              </div>
+          <div className="space-y-6">
+            <SettingRow
+              title="Показывать субтитры"
+              description="Включить субтитры при воспроизведении"
+            >
               <button
                 onClick={() => updateSetting('subtitles', !settings.subtitles)}
-                className={`tv-focusable w-14 h-7 rounded-full transition-all relative ${
-                  settings.subtitles ? 'bg-[#e94560]' : 'bg-[#252550]'
-                }`}
+                className={`toggle-switch ${settings.subtitles ? 'on' : 'off'}`}
+                tabIndex={0}
+                role="switch"
+                aria-checked={settings.subtitles}
+                onKeyDown={(e) => e.key === 'Enter' && updateSetting('subtitles', !settings.subtitles)}
               >
-                <div className={`w-5 h-5 rounded-full bg-white absolute top-1 transition-all ${
-                  settings.subtitles ? 'right-1' : 'left-1'
-                }`} />
+                <div className="toggle-knob" />
+              </button>
+            </SettingRow>
+
+            <SettingRow
+              title="Размер субтитров"
+              description="Размер текста субтитров"
+            >
+              <div className="flex gap-2">
+                {(['small', 'medium', 'large'] as const).map(size => (
+                  <button
+                    key={size}
+                    onClick={() => updateSetting('subtitleSize', size)}
+                    className={`tv-btn px-5 py-3 rounded-xl text-sm font-bold transition-all ${
+                      settings.subtitleSize === size
+                        ? 'bg-[var(--tv-accent)] text-white'
+                        : 'bg-[var(--tv-card)] text-[var(--tv-text-secondary)] hover:text-white border border-[var(--tv-border)]'
+                    }`}
+                    tabIndex={0}
+                  >
+                    {size === 'small' ? 'Маленький' : size === 'medium' ? 'Средний' : 'Большой'}
+                  </button>
+                ))}
+              </div>
+            </SettingRow>
+          </div>
+        </section>
+
+        {/* Theme */}
+        <section className="bg-[var(--tv-surface)] rounded-2xl p-8 border border-[var(--tv-border)]">
+          <div className="flex items-center gap-3 mb-6">
+            <Palette size={24} className="text-[var(--tv-accent)]" />
+            <h2 className="text-2xl font-bold text-white">Оформление</h2>
+          </div>
+
+          <SettingRow
+            title="Тема интерфейса"
+            description="Цветовая схема приложения"
+          >
+            <div className="flex gap-2">
+              <button
+                onClick={() => updateSetting('theme', 'dark')}
+                className={`tv-btn px-5 py-3 rounded-xl text-sm font-bold transition-all ${
+                  settings.theme === 'dark'
+                    ? 'bg-[var(--tv-accent)] text-white'
+                    : 'bg-[var(--tv-card)] text-[var(--tv-text-secondary)] hover:text-white border border-[var(--tv-border)]'
+                }`}
+                tabIndex={0}
+              >
+                Тёмная
+              </button>
+              <button
+                onClick={() => updateSetting('theme', 'amoled')}
+                className={`tv-btn px-5 py-3 rounded-xl text-sm font-bold transition-all ${
+                  settings.theme === 'amoled'
+                    ? 'bg-[var(--tv-accent)] text-white'
+                    : 'bg-[var(--tv-card)] text-[var(--tv-text-secondary)] hover:text-white border border-[var(--tv-border)]'
+                }`}
+                tabIndex={0}
+              >
+                AMOLED
               </button>
             </div>
-
-            {/* Subtitle size */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Размер субтитров</p>
-                <p className="text-[#a0a0c0] text-sm">Размер текста субтитров на экране</p>
-              </div>
-              <select
-                value={settings.subtitleSize}
-                onChange={(e) => updateSetting('subtitleSize', e.target.value as 'small' | 'medium' | 'large')}
-                className="tv-focusable px-4 py-2 bg-[#252550] border border-[#353570] rounded-lg text-white text-sm focus:border-[#e94560] focus:outline-none cursor-pointer"
-              >
-                <option value="small">Маленький</option>
-                <option value="medium">Средний</option>
-                <option value="large">Большой</option>
-              </select>
-            </div>
-          </div>
+          </SettingRow>
         </section>
 
-        {/* Display */}
-        <section className="bg-[#1a1a3e] rounded-2xl p-6 border border-[#252550]">
-          <div className="flex items-center gap-2 mb-5">
-            <Palette size={20} className="text-[#e94560]" />
-            <h2 className="text-lg font-semibold text-white">Оформление</h2>
+        {/* Controls Help */}
+        <section className="bg-[var(--tv-surface)] rounded-2xl p-8 border border-[var(--tv-border)]">
+          <div className="flex items-center gap-3 mb-6">
+            <Keyboard size={24} className="text-[var(--tv-accent)]" />
+            <h2 className="text-2xl font-bold text-white">Управление (пульт / клавиатура)</h2>
           </div>
 
-          <div className="space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">Тема интерфейса</p>
-                <p className="text-[#a0a0c0] text-sm">Выберите цветовую схему</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { keys: '← → ↑ ↓', desc: 'Навигация по интерфейсу' },
+              { keys: 'OK / Enter', desc: 'Выбрать / Воспроизвести' },
+              { keys: 'Esc / Back', desc: 'Назад / Закрыть' },
+              { keys: 'Space', desc: 'Пауза / Воспроизведение' },
+              { keys: '→ (в плеере)', desc: 'Перемотка +10 сек' },
+              { keys: '← (в плеере)', desc: 'Перемотка -10 сек' },
+              { keys: '↑ ↓ (в плеере)', desc: 'Громкость' },
+              { keys: 'F', desc: 'Полный экран' },
+              { keys: 'M', desc: 'Вкл/Выкл звук' },
+              { keys: 'N / P', desc: 'Следующая / Предыдущая серия' },
+            ].map((item, i) => (
+              <div key={i} className="tv-item flex items-center gap-4 p-4 bg-[var(--tv-card)] rounded-xl cursor-default" tabIndex={0}>
+                <kbd className="px-3 py-1.5 bg-[var(--tv-bg)] rounded-lg text-sm text-white font-mono font-bold border border-[var(--tv-border)] whitespace-nowrap">
+                  {item.keys}
+                </kbd>
+                <span className="text-[var(--tv-text-secondary)] text-base">{item.desc}</span>
               </div>
-              <select
-                value={settings.theme}
-                onChange={(e) => updateSetting('theme', e.target.value as 'dark' | 'amoled')}
-                className="tv-focusable px-4 py-2 bg-[#252550] border border-[#353570] rounded-lg text-white text-sm focus:border-[#e94560] focus:outline-none cursor-pointer"
-              >
-                <option value="dark">Тёмная</option>
-                <option value="amoled">AMOLED (чёрная)</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Navigation Help */}
-        <section className="bg-[#1a1a3e] rounded-2xl p-6 border border-[#252550]">
-          <div className="flex items-center gap-2 mb-5">
-            <Monitor size={20} className="text-[#e94560]" />
-            <h2 className="text-lg font-semibold text-white">Управление</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="flex items-center gap-3 p-3 bg-[#252550] rounded-xl">
-              <kbd className="px-2 py-1 bg-[#0f0f23] rounded text-xs text-white font-mono">←→↑↓</kbd>
-              <span className="text-[#a0a0c0] text-sm">Навигация по интерфейсу</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-[#252550] rounded-xl">
-              <kbd className="px-2 py-1 bg-[#0f0f23] rounded text-xs text-white font-mono">OK/Enter</kbd>
-              <span className="text-[#a0a0c0] text-sm">Выбрать / Воспроизвести</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-[#252550] rounded-xl">
-              <kbd className="px-2 py-1 bg-[#0f0f23] rounded text-xs text-white font-mono">Esc/Back</kbd>
-              <span className="text-[#a0a0c0] text-sm">Назад</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-[#252550] rounded-xl">
-              <kbd className="px-2 py-1 bg-[#0f0f23] rounded text-xs text-white font-mono">Space</kbd>
-              <span className="text-[#a0a0c0] text-sm">Пауза / Воспроизведение</span>
-            </div>
+            ))}
           </div>
         </section>
 
         {/* Actions */}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-6 flex-wrap">
           <button
             onClick={resetSettings}
-            className="tv-focusable px-5 py-3 bg-[#252550] text-white rounded-xl hover:bg-[#353570] transition-colors flex items-center gap-2"
+            className="tv-btn px-6 py-4 bg-[var(--tv-card)] text-white rounded-xl hover:bg-[var(--tv-card-hover)] transition-colors flex items-center gap-2 text-base font-semibold border border-[var(--tv-border)]"
+            tabIndex={0}
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={18} />
             Сбросить настройки
           </button>
-          <div className="flex items-center gap-2 text-[#a0a0c0] text-sm">
-            <Info size={14} />
-            <span>Настройки сохраняются автоматически</span>
+          <div className="flex items-center gap-2 text-[var(--tv-text-secondary)]">
+            <Info size={16} />
+            <span className="text-sm">Настройки сохраняются автоматически</span>
           </div>
         </div>
 
         {/* App Info */}
-        <div className="bg-[#1a1a3e] rounded-2xl p-6 border border-[#252550] text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#e94560] to-[#c73e54] flex items-center justify-center mx-auto mb-3">
-            <Gauge size={28} className="text-white" />
+        <div className="bg-[var(--tv-surface)] rounded-2xl p-8 border border-[var(--tv-border)] text-center">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--tv-accent)] to-[#c73e54] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[var(--tv-accent)]/20">
+            <Tv size={36} className="text-white" />
           </div>
-          <h3 className="text-white font-bold text-lg">Дунхуа ТВ</h3>
-          <p className="text-[#a0a0c0] text-sm mt-1">Версия 1.0 • TV Edition</p>
-          <p className="text-[#a0a0c0] text-xs mt-2">
+          <h3 className="text-white font-black text-2xl">Дунхуа ТВ</h3>
+          <p className="text-[var(--tv-text-secondary)] text-base mt-2">Версия 2.0 • TV Edition</p>
+          <p className="text-[var(--tv-text-dim)] text-sm mt-2">
             Оптимизировано для Android TV • dunhuatv.ru
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingRow({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between py-4 border-b border-[var(--tv-border)] last:border-0">
+      <div className="flex-1 mr-6">
+        <p className="text-white font-semibold text-lg">{title}</p>
+        <p className="text-[var(--tv-text-secondary)] text-sm mt-0.5">{description}</p>
+      </div>
+      <div className="flex-shrink-0">
+        {children}
       </div>
     </div>
   );
